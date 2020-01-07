@@ -152,7 +152,7 @@ void setup() {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 
-  //`rtc.adjust(DateTime(2020, 1, 7, 11,57, 0));
+  //rtc.adjust(DateTime(2019, 11, 13, 10,37, 0));
   
   lcd.begin(16, 2);
   pinMode(relay, OUTPUT);
@@ -166,47 +166,35 @@ void loop() {
   lcd.clear();
   DateTime now = rtc.now(); //Leer datos del RTC y mostrar
   imprimeTiempo(now);
-  
   if ((int)(now.hour()) == horaPrimerRiego) {/*Si es la hora del primer riego*/
     if (((int)(now.minute()) == minutoPrimerRiego) && ((int)(now.second() >= 0)) && ((int)(now.second() < tiempoRiego))) {
       Serial.println("Hora Primer Riego activada" );
       digitalWrite(relay, HIGH);
-      
-      lcd.clear();
-      String texto = "Activando Riego";
-      show(0, 0, texto);
-      delay((2000));
-      lcd.clear();
-      
       int cont = 0;
       while (cont < tiempoRiego) {
+        lcd.clear();
+        String texto = "Riego Activado";
+        show(0, 0, texto);
         cont+=1;
         delay((1000));
       }
       digitalWrite(relay, LOW);
-      asm("jmp 0x0000");
-      //Serial.println("Segundos del Primer Riego =" + ((String)(now.second()))  );
+      Serial.println("Segundos del Primer Riego =" + ((String)(now.second()))  );
     }
-  
   } else if ((int)(now.hour()) == horaSegundoRiego) { /*Si es la hora del segundo riego*/
     if (((int)(now.minute()) == minutoSegundoRiego) && ((int)(now.second() >= 0)) && ((int)(now.second() < tiempoRiego))) {
       Serial.println("Hora Segundo Riego activada" );
       digitalWrite(relay, HIGH);
-
-      lcd.clear();
-      String texto = "Activando Riego";
-      show(0, 0, texto);
-      delay((2000));
-      lcd.clear();
-      
       int cont = 0;
       while (cont < tiempoRiego) {
+        lcd.clear();
+        String texto = "Riego Activado";
+        show(0, 0, texto);
         cont+=1;
         delay((1000));
       }
       digitalWrite(relay, LOW);
-      asm("jmp 0x0000");
-      //Serial.println("Segundos del Segundo Riego =" + ((String)(now.second())) );
+      Serial.println("Segundos del Segundo Riego =" + ((String)(now.second())) );
     }
   }
   if ((portada == false ) ) {
