@@ -17,15 +17,15 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 bool portada = false;
 int relay = 6;
 bool riegoActivado = false;
-int contador = 0;
+//int contador = 0;
 /*---------------------------------------------------------------------------------------------------------*/
 /*VARIABLES QUE SE PUEDEN REGULAR*/
 String daysOfTheWeek[7] = { "Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado" };
-int tiempoRiego = 3;
+int tiempoRiego = 4;
 int horaPrimerRiego = 8;
-int minutoPrimerRiego =0;
+int minutoPrimerRiego =20;
 int horaSegundoRiego = 16;
-int minutoSegundoRiego = 0;
+int minutoSegundoRiego = 20;
 
 /*---------------------------------------------------------------------------------------------------------*/
 //funcion para imprimir en pantalla
@@ -35,58 +35,60 @@ void show(int columna, int fila, String texto ) {
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
-//funcion para imprimir portada   = 14 segundos
+//funcion para imprimir portada   = 10 segundos
 String imprimePortada() {
   lcd.clear();
-  String texto = "Tecnologico de";
-  show(0, 0, texto);
-  String aux = "Costa Rica";
-  show(1, 0, aux);
-  delay(2000);
-
-  lcd.clear();
-  String texto1 = "Ingenieria en";
+  String texto1;
+  String texto2; 
+  texto1 = "Tecnologico de";
   show(0, 0, texto1);
-  String aux1 = "Computacion";
-  show(1, 0, aux1);
-  delay(2000);
-
-  lcd.clear();
-  String texto3 = "Campus TEC";
-  show(0, 0, texto3);
-  String aux3 = "Local San Carlos";
-  show(1, 0, aux3);
-  delay(2000);
-
-  lcd.clear();
-  String texto10 = "Profesor: ";
-  show(0, 0, texto10);
+  texto2 = "Costa Rica";
+  show(1, 0, texto2);
   delay(1000);
 
   lcd.clear();
-  String texto11 = "Jorge";
-  show(0, 0, texto11);
-  String aux11 = "Alfaro V.";
-  show(1, 0, aux11);
-  delay(2000);
-
-  lcd.clear();
-  String texto4 = "Estudiante: ";
-  show(0, 0, texto4);
+  texto1 = "Ingenieria en";
+  show(0, 0, texto1);
+  texto2 = "Computacion";
+  show(1, 0, texto2);
   delay(1000);
 
   lcd.clear();
-  String texto5 = "Randald";
-  show(0, 0, texto5);
-  String aux5 = "Villegas B.";
-  show(1, 0, aux5);
+  texto1 = "Campus TEC";
+  show(0, 0, texto1);
+  texto2 = "Local San Carlos";
+  show(1, 0, texto2);
+  delay(1000);
+
+  lcd.clear();
+  texto1 = "   Profesor:    ";
+  show(0, 0, texto1);
+  delay(1000);
+
+  lcd.clear();
+  texto1 = "Jorge";
+  show(0, 0, texto1);
+  texto2 = "Alfaro Velasco";
+  show(1, 0, texto2);
+  delay(1000);
+
+  lcd.clear();
+  texto1 = "   Estudiante:   ";
+  show(0, 0, texto1);
+  delay(1000);
+
+  lcd.clear();
+  texto1 = "Randald";
+  show(0, 0, texto1);
+  texto2 = "Villegas Brenes";
+  show(1, 0, texto2);
   delay(2000);
 
   lcd.clear();
-  String texto2 = "Sistema de Riego";
-  show(0, 0, texto2);
-  String aux2 = "Automatizado";
-  show(1, 0, aux2);
+  texto1 = "Sistema de Riego";
+  show(0, 0, texto1);
+  texto2 = "**Automatizado**";
+  show(1, 0, texto2);
   delay(2000);
   lcd.clear();
 
@@ -103,24 +105,12 @@ String getDia(DateTime now) {
 /*---------------------------------------------------------------------------------------------------------*/
 //funcion para obtener la fecha
 String getFecha(DateTime now) {
-  Serial.print(now.year(), DEC);
-  Serial.print('/');
-  Serial.print(now.month(), DEC);
-  Serial.print('/');
-  Serial.print(now.day(), DEC);
-  Serial.println();
   String fecha = (String)(now.day()) + "/" + (String)(now.month()) + "/" + (String)(now.year());
   return fecha;
 }
 /*---------------------------------------------------------------------------------------------------------*/
 //funcion para obtener el tiempo
 String getHora(DateTime now) {
-  Serial.print(now.hour(), DEC);
-  Serial.print(':');
-  Serial.print(now.minute(), DEC);
-  Serial.print(':');
-  Serial.print(now.second(), DEC);
-  Serial.println();
   String hora = (String)(now.hour()) + ":" + (String)( now.minute()) + ":" + (String)(now.second());
   return hora;
 }
@@ -131,7 +121,6 @@ void imprimeTiempo(DateTime now) {
   String fecha = getFecha(now);
   String hora = getHora(now);
   hora = hora + " " + ((String)(daysOfTheWeek[now.dayOfTheWeek()]));
-  
   show(0, 0, hora);
   show(1, 0, fecha);
 }
@@ -140,44 +129,30 @@ void imprimeTiempo(DateTime now) {
 void setup() {
   Serial.begin(9600);
   delay(1000);
-
   if (!rtc.begin()) {
     Serial.println(F("No se encontro el RTC"));
     while (1);
   }
-
   // Si desconecto de corriente tomamos la hora de compilacion
   if (rtc.lostPower()) {
     // Fijar a fecha y hora de compilacion
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
-
-  //`rtc.adjust(DateTime(2020, 1, 7, 11,57, 0));
-  
+  //rtc.adjust(DateTime(2020, 1, 7, 11,57, 0));
   lcd.begin(16, 2);
   pinMode(relay, OUTPUT);
-
 }
-
 /*---------------------------------------------------------------------------------------------------------*/
 //ciclo de aplicacion
 void loop() {
   digitalWrite(relay, LOW);
   lcd.clear();
   DateTime now = rtc.now(); //Leer datos del RTC y mostrar
-  imprimeTiempo(now);
-  
+  imprimeTiempo(now);  
   if ((int)(now.hour()) == horaPrimerRiego) {/*Si es la hora del primer riego*/
     if (((int)(now.minute()) == minutoPrimerRiego) && ((int)(now.second() >= 0)) && ((int)(now.second() < tiempoRiego))) {
-      Serial.println("Hora Primer Riego activada" );
+      lcd.clear();
       digitalWrite(relay, HIGH);
-      
-      lcd.clear();
-      String texto = "Activando Riego";
-      show(0, 0, texto);
-      delay((2000));
-      lcd.clear();
-      
       int cont = 0;
       while (cont < tiempoRiego) {
         cont+=1;
@@ -187,18 +162,10 @@ void loop() {
       asm("jmp 0x0000");
       //Serial.println("Segundos del Primer Riego =" + ((String)(now.second()))  );
     }
-  
   } else if ((int)(now.hour()) == horaSegundoRiego) { /*Si es la hora del segundo riego*/
     if (((int)(now.minute()) == minutoSegundoRiego) && ((int)(now.second() >= 0)) && ((int)(now.second() < tiempoRiego))) {
-      Serial.println("Hora Segundo Riego activada" );
+      lcd.clear();
       digitalWrite(relay, HIGH);
-
-      lcd.clear();
-      String texto = "Activando Riego";
-      show(0, 0, texto);
-      delay((2000));
-      lcd.clear();
-      
       int cont = 0;
       while (cont < tiempoRiego) {
         cont+=1;
@@ -213,13 +180,12 @@ void loop() {
     digitalWrite(relay, LOW);
     imprimePortada();
   }
-
-  contador += 1;
-  if (contador == 60) {
-    portada = false;
-    contador = 0;
+  //contador += 1;
+  //if (contador == 60) {
+    if(((int)(now.second() == 15))){
+    asm("jmp 0x0000");
+    //portada = false;
+    //contador = 0;
   }
-
   delay(1000);
-
 }
